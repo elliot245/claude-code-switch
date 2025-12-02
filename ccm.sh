@@ -810,8 +810,8 @@ switch_to_glm() {
     echo -e "${YELLOW}🔄 切换到 GLM4.6 模型...${NC}"
     clean_env
     if is_effectively_set "$GLM_API_KEY"; then
-        export ANTHROPIC_BASE_URL="https://open.bigmodel.cn/api/anthropic"
-        export ANTHROPIC_API_URL="https://open.bigmodel.cn/api/anthropic"
+        export ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic"
+        export ANTHROPIC_API_URL="https://api.z.ai/api/anthropic"
         export ANTHROPIC_AUTH_TOKEN="$GLM_API_KEY"
         export ANTHROPIC_API_KEY="$GLM_API_KEY"
         export ANTHROPIC_MODEL="glm-4.6"
@@ -1428,8 +1428,8 @@ emit_env_exports() {
                 echo "$prelude"
                 echo "export API_TIMEOUT_MS='600000'"
                 echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
-                echo "export ANTHROPIC_BASE_URL='https://open.bigmodel.cn/api/anthropic'"
-                echo "export ANTHROPIC_API_URL='https://open.bigmodel.cn/api/anthropic'"
+                echo "export ANTHROPIC_BASE_URL='https://api.z.ai/api/anthropic'"
+                echo "export ANTHROPIC_API_URL='https://api.z.ai/api/anthropic'"
                 echo "if [ -z \"\${GLM_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${GLM_API_KEY}\""
                 local glm_model="${GLM_MODEL:-glm-4.6}"

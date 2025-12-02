@@ -146,7 +146,7 @@ ccc() {
   # Helper: known model keyword
   _is_known_model() {
     case "\$1" in
-      deepseek|ds|glm|glm4|glm4.6|kimi|kimi2|qwen|longcat|lc|minimax|mm|claude|sonnet|s|opus|o|haiku|h)
+      deepseek|ds|glm|glm4|glm4.6|cc|codecmd|kimi|kimi2|qwen|longcat|lc|minimax|mm|claude|sonnet|s|opus|o|haiku|h)
         return 0 ;;
       *)
         return 1 ;;

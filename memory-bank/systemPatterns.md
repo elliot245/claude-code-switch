@@ -125,3 +125,29 @@
 **Purpose:** Prevent user frustration through early issue detection
 **Implementation:** Configuration file validation, API key format checking, service availability testing
 **Benefits:** Improved onboarding experience, reduced support burden
+
+## CodeCMD Integration Patterns
+
+### 1. Aggregator Platform Abstraction Pattern
+**Purpose:** Multi-model aggregator support through single integration point
+**Implementation:** Single CodeCMD API endpoint with internal model routing
+**Benefits:** Model diversity without individual provider integration complexity
+**Pattern:** `switch_to_codecmd()` → CodeCMD API → Internal model selection
+
+### 2. Regional Optimization Pattern
+**Purpose:** Performance optimization for specific geographic markets
+**Implementation:** Region-specific endpoint selection and routing logic
+**Benefits:** Reduced latency, improved reliability for target markets
+**Application:** Chinese market optimization through CodeCMD's regional infrastructure
+
+### 3. Advanced Model Access Pattern
+**Purpose:** Early access to cutting-edge models before direct API availability
+**Implementation:** Aggregator partnership for model preview access
+**Benefits:** Competitive differentiation, technology leadership positioning
+**Examples:** GPT-5-Codex, Factory Sonnet 4 access through CodeCMD partnership
+
+### 4. Multi-Aggregator Architecture Pattern
+**Purpose:** Extensible framework for multiple aggregator platforms
+**Implementation:** Standardized aggregator integration interface with provider-specific implementations
+**Benefits:** Scalable ecosystem expansion, consistent user experience across aggregators
+**Future Proof:** Ready for additional aggregator partnerships beyond CodeCMD

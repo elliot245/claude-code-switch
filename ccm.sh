@@ -137,6 +137,9 @@ ARK_API_KEY=your-ark-api-key
 # Qwen（阿里云 DashScope）
 QWEN_API_KEY=your-qwen-api-key
 
+# CodeCMD (支持 Claude Opus 4.5, GPT-5-Codex, Gemini 3 Pro, Factory Sonnet 4)
+CODECMD_API_KEY=your-codecmd-api-key
+
 # Claude (如果使用API key而非Pro订阅)
 CLAUDE_API_KEY=your-claude-api-key
 
@@ -166,6 +169,8 @@ MINIMAX_MODEL=MiniMax-M2
 MINIMAX_SMALL_FAST_MODEL=MiniMax-M2
 SEED_MODEL=doubao-seed-code-preview-latest
 SEED_SMALL_FAST_MODEL=doubao-seed-code-preview-latest
+CODECMD_MODEL=claude-opus-4.5
+CODECMD_SMALL_FAST_MODEL=claude-sonnet-4.5
 
 EOF
         echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}" >&2
@@ -259,6 +264,9 @@ ARK_API_KEY=your-ark-api-key
 # Qwen（阿里云 DashScope）
 QWEN_API_KEY=your-qwen-api-key
 
+# CodeCMD (支持 Claude Opus 4.5, GPT-5-Codex, Gemini 3 Pro, Factory Sonnet 4)
+CODECMD_API_KEY=your-codecmd-api-key
+
 # Claude (如果使用API key而非Pro订阅)
 CLAUDE_API_KEY=your-claude-api-key
 
@@ -288,6 +296,8 @@ MINIMAX_MODEL=MiniMax-M2
 MINIMAX_SMALL_FAST_MODEL=MiniMax-M2
 SEED_MODEL=doubao-seed-code-preview-latest
 SEED_SMALL_FAST_MODEL=doubao-seed-code-preview-latest
+CODECMD_MODEL=claude-opus-4.5
+CODECMD_SMALL_FAST_MODEL=claude-sonnet-4.5
 
 EOF
     echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}" >&2
@@ -961,6 +971,42 @@ switch_to_qwen() {
     echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
 }
 
+# 切换到CodeCMD
+switch_to_codecmd() {
+    echo -e "${YELLOW}🔄 $(t 'switching_to') CodeCMD $(t 'model')...${NC}"
+    clean_env
+    if is_effectively_set "$CODECMD_API_KEY"; then
+        # CodeCMD官方API
+        export ANTHROPIC_BASE_URL="https://api-claude.codecmd.com"
+        export ANTHROPIC_API_URL="https://api-claude.codecmd.com"
+        export ANTHROPIC_AUTH_TOKEN="$CODECMD_API_KEY"
+        export ANTHROPIC_API_KEY="$CODECMD_API_KEY"
+        # CodeCMD默认模型（支持Claude Opus 4.5, GPT-5-Codex, Gemini 3 Pro, Factory Sonnet 4）
+        local codecmd_model="${CODECMD_MODEL:-claude-opus-4.5}"
+        local codecmd_small="${CODECMD_SMALL_FAST_MODEL:-claude-sonnet-4.5}"
+        export ANTHROPIC_MODEL="$codecmd_model"
+        export ANTHROPIC_SMALL_FAST_MODEL="$codecmd_small"
+        echo -e "${GREEN}✅ $(t 'switched_to') CodeCMD（$(t 'official')）${NC}"
+    elif is_effectively_set "$PPINFRA_API_KEY"; then
+        # 备用：PPINFRA CodeCMD 支持
+        export ANTHROPIC_BASE_URL="https://api.ppinfra.com/anthropic"
+        export ANTHROPIC_API_URL="https://api.ppinfra.com/anthropic"
+        export ANTHROPIC_AUTH_TOKEN="$PPINFRA_API_KEY"
+        export ANTHROPIC_API_KEY="$PPINFRA_API_KEY"
+        local codecmd_model="${CODECMD_MODEL:-codecmd/claude-opus-4.5}"
+        local codecmd_small="${CODECMD_SMALL_FAST_MODEL:-codecmd/claude-sonnet-4.5}"
+        export ANTHROPIC_MODEL="$codecmd_model"
+        export ANTHROPIC_SMALL_FAST_MODEL="$codecmd_small"
+        echo -e "${GREEN}✅ $(t 'switched_to') CodeCMD（$(t 'ppinfra_backup')）${NC}"
+    else
+        echo -e "${RED}❌ Please configure CODECMD_API_KEY or PPINFRA_API_KEY${NC}"
+        return 1
+    fi
+    echo "   BASE_URL: $ANTHROPIC_BASE_URL"
+    echo "   MODEL: $ANTHROPIC_MODEL"
+    echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
+}
+
 # 切换到豆包 Seed-Code (Doubao)
 switch_to_seed() {
     echo -e "${YELLOW}🔄 $(t 'switching_to') 豆包 Seed-Code $(t 'model')...${NC}"
@@ -1162,6 +1208,7 @@ show_help() {
     echo "  minimax, mm        - env minimax"
     echo "  qwen               - env qwen"
     echo "  glm, glm4          - env glm"
+    echo "  codecmd, cc        - env codecmd"
     echo "  claude, sonnet, s  - env claude"
     echo "  opus, o            - env opus"
     echo "  haiku, h           - env haiku"
@@ -1453,6 +1500,36 @@ emit_env_exports() {
                 return 1
             fi
             ;;
+        "codecmd"|"cc")
+            if is_effectively_set "$CODECMD_API_KEY"; then
+                echo "$prelude"
+                echo "export API_TIMEOUT_MS='600000'"
+                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
+                echo "export ANTHROPIC_BASE_URL='https://api-claude.codecmd.com'"
+                echo "export ANTHROPIC_API_URL='https://api-claude.codecmd.com'"
+                echo "if [ -z \"\${CODECMD_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
+                echo "export ANTHROPIC_AUTH_TOKEN=\"\${CODECMD_API_KEY}\""
+                local codecmd_model="${CODECMD_MODEL:-claude-opus-4.5}"
+                local codecmd_small="${CODECMD_SMALL_FAST_MODEL:-claude-sonnet-4.5}"
+                echo "export ANTHROPIC_MODEL='${codecmd_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${codecmd_small}'"
+            elif is_effectively_set "$PPINFRA_API_KEY"; then
+                echo "$prelude"
+                echo "export API_TIMEOUT_MS='600000'"
+                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
+                echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
+                echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
+                echo "if [ -z \"\${CODECMD_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
+                echo "export ANTHROPIC_AUTH_TOKEN=\"\${PPINFRA_API_KEY}\""
+                local codecmd_model="${CODECMD_MODEL:-codecmd/claude-opus-4.5}"
+                local codecmd_small="${CODECMD_SMALL_FAST_MODEL:-codecmd/claude-sonnet-4.5}"
+                echo "export ANTHROPIC_MODEL='${codecmd_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${codecmd_small}'"
+            else
+                echo -e "${RED}❌ Please configure CODECMD_API_KEY or PPINFRA_API_KEY${NC}" >&2
+                return 1
+            fi
+            ;;
         "claude"|"sonnet"|"s")
             echo "$prelude"
             # 官方 Anthropic 默认网关，无需设置 BASE_URL
@@ -1671,6 +1748,9 @@ main() {
             ;;
         "glm"|"glm4"|"glm4.6")
             emit_env_exports glm
+            ;;
+        "codecmd"|"cc")
+            emit_env_exports codecmd
             ;;
         "claude"|"sonnet"|"s")
             emit_env_exports claude

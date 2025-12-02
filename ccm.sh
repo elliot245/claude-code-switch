@@ -169,8 +169,8 @@ MINIMAX_MODEL=MiniMax-M2
 MINIMAX_SMALL_FAST_MODEL=MiniMax-M2
 SEED_MODEL=doubao-seed-code-preview-latest
 SEED_SMALL_FAST_MODEL=doubao-seed-code-preview-latest
-CODECMD_MODEL=claude-opus-4.5
-CODECMD_SMALL_FAST_MODEL=claude-sonnet-4.5
+CODECMD_MODEL=claude-sonnet-4-5-20250929
+CODECMD_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 
 EOF
         echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}" >&2
@@ -296,8 +296,8 @@ MINIMAX_MODEL=MiniMax-M2
 MINIMAX_SMALL_FAST_MODEL=MiniMax-M2
 SEED_MODEL=doubao-seed-code-preview-latest
 SEED_SMALL_FAST_MODEL=doubao-seed-code-preview-latest
-CODECMD_MODEL=claude-opus-4.5
-CODECMD_SMALL_FAST_MODEL=claude-sonnet-4.5
+CODECMD_MODEL=claude-sonnet-4-5-20250929
+CODECMD_SMALL_FAST_MODEL=claude-haiku-4-5
 
 EOF
     echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}" >&2
@@ -973,7 +973,7 @@ switch_to_qwen() {
 
 # 切换到CodeCMD
 switch_to_codecmd() {
-    echo -e "${YELLOW}🔄 $(t 'switching_to') CodeCMD $(t 'model')...${NC}"
+    echo -e "${YELLOW}🔄 切换到 CodeCMD 模型...${NC}"
     clean_env
     if is_effectively_set "$CODECMD_API_KEY"; then
         # CodeCMD官方API
@@ -982,22 +982,18 @@ switch_to_codecmd() {
         export ANTHROPIC_AUTH_TOKEN="$CODECMD_API_KEY"
         export ANTHROPIC_API_KEY="$CODECMD_API_KEY"
         # CodeCMD默认模型（支持Claude Opus 4.5, GPT-5-Codex, Gemini 3 Pro, Factory Sonnet 4）
-        local codecmd_model="${CODECMD_MODEL:-claude-opus-4.5}"
-        local codecmd_small="${CODECMD_SMALL_FAST_MODEL:-claude-sonnet-4.5}"
-        export ANTHROPIC_MODEL="$codecmd_model"
-        export ANTHROPIC_SMALL_FAST_MODEL="$codecmd_small"
-        echo -e "${GREEN}✅ $(t 'switched_to') CodeCMD（$(t 'official')）${NC}"
+        export ANTHROPIC_MODEL="claude-sonnet-4-5-20250929"
+        export ANTHROPIC_SMALL_FAST_MODEL="claude-sonnet-4-5-20250929"
+        echo -e "${GREEN}✅ 已切换到 CodeCMD（官方）${NC}"
     elif is_effectively_set "$PPINFRA_API_KEY"; then
         # 备用：PPINFRA CodeCMD 支持
         export ANTHROPIC_BASE_URL="https://api.ppinfra.com/anthropic"
         export ANTHROPIC_API_URL="https://api.ppinfra.com/anthropic"
         export ANTHROPIC_AUTH_TOKEN="$PPINFRA_API_KEY"
         export ANTHROPIC_API_KEY="$PPINFRA_API_KEY"
-        local codecmd_model="${CODECMD_MODEL:-codecmd/claude-opus-4.5}"
-        local codecmd_small="${CODECMD_SMALL_FAST_MODEL:-codecmd/claude-sonnet-4.5}"
-        export ANTHROPIC_MODEL="$codecmd_model"
-        export ANTHROPIC_SMALL_FAST_MODEL="$codecmd_small"
-        echo -e "${GREEN}✅ $(t 'switched_to') CodeCMD（$(t 'ppinfra_backup')）${NC}"
+        export ANTHROPIC_MODEL="codecmd/claude-sonnet-4-5-20250929"
+        export ANTHROPIC_SMALL_FAST_MODEL="codecmd/claude-sonnet-4-5-20250929"
+        echo -e "${GREEN}✅ 已切换到 CodeCMD（PPINFRA 备用）${NC}"
     else
         echo -e "${RED}❌ Please configure CODECMD_API_KEY or PPINFRA_API_KEY${NC}"
         return 1
@@ -1509,8 +1505,8 @@ emit_env_exports() {
                 echo "export ANTHROPIC_API_URL='https://api-claude.codecmd.com'"
                 echo "if [ -z \"\${CODECMD_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${CODECMD_API_KEY}\""
-                local codecmd_model="${CODECMD_MODEL:-claude-opus-4.5}"
-                local codecmd_small="${CODECMD_SMALL_FAST_MODEL:-claude-sonnet-4.5}"
+                local codecmd_model="${CODECMD_MODEL:-claude-sonnet-4-5-20250929}"
+                local codecmd_small="${CODECMD_SMALL_FAST_MODEL:-claude-sonnet-4-5-20250929}"
                 echo "export ANTHROPIC_MODEL='${codecmd_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${codecmd_small}'"
             elif is_effectively_set "$PPINFRA_API_KEY"; then
@@ -1521,8 +1517,8 @@ emit_env_exports() {
                 echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
                 echo "if [ -z \"\${CODECMD_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${PPINFRA_API_KEY}\""
-                local codecmd_model="${CODECMD_MODEL:-codecmd/claude-opus-4.5}"
-                local codecmd_small="${CODECMD_SMALL_FAST_MODEL:-codecmd/claude-sonnet-4.5}"
+                local codecmd_model="${CODECMD_MODEL:-codecmd/claude-sonnet-4-5-20250929}"
+                local codecmd_small="${CODECMD_SMALL_FAST_MODEL:-codecmd/claude-sonnet-4-5-20250929}"
                 echo "export ANTHROPIC_MODEL='${codecmd_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${codecmd_small}'"
             else

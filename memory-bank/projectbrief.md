@@ -124,3 +124,23 @@ CCM is a strategically positioned infrastructure project within the AI tools eco
 - Balance between tactical product development and strategic infrastructure
 - Documentation and methodology maintenance
 - Community and ecosystem management
+
+## New Model Integration: CodeCMD Platform
+
+**Strategic Expansion Opportunity:**
+- **Platform**: CodeCMD - AI programming aggregation platform
+- **Models Supported**: Claude Opus 4.5, GPT-5-Codex, Gemini 3 Pro, Factory Sonnet 4
+- **Integration Value**: Multi-model aggregator platform expanding provider ecosystem
+- **Market Position**: Chinese market focus with "一站式集成" (one-stop integration)
+
+**Technical Integration Requirements:**
+- API endpoint discovery and authentication pattern analysis
+- Multi-model routing support within existing fallback framework
+- Potential regional considerations for Chinese market deployment
+- Extension of current 7-provider model to 8+ providers with aggregator support
+
+**Business Model Implications:**
+- Aggregator platform partnership opportunities
+- Extended market reach through CodeCMD's user base
+- Potential revenue sharing through aggregator referral model
+- Enhanced ecosystem positioning through platform diversity

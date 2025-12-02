@@ -128,3 +128,35 @@
 **Modular Design:** Feature isolation for independent development
 **Configuration Complexity:** Progressive feature disclosure based on user sophistication
 **Backward Compatibility:** Maintaining compatibility across major versions
+
+## CodeCMD Technical Integration Requirements
+
+### 1. API Discovery and Authentication Architecture
+**Endpoint Analysis**: CodeCMD platform API endpoint discovery and authentication pattern mapping
+**Authentication Methods**: Investigation of API key formats, authentication headers, and regional access patterns
+**Integration Pattern**: Extension of existing multi-provider abstraction layer to support aggregator platforms
+**Compatibility Requirements**: Ensure compatibility with existing environment variable injection and fallback mechanisms
+
+### 2. Multi-Model Aggregator Integration
+**Model Selection Framework**: Implementation of model selection within CodeCMD's aggregator API
+**Routing Logic**: Development of routing for Claude Opus 4.5, GPT-5-Codex, Gemini 3 Pro, Factory Sonnet 4
+**Fallback Enhancement**: Integration of CodeCMD as both primary and fallback service within existing framework
+**Configuration Management**: Addition of CodeCMD-specific configuration parameters and model overrides
+
+### 3. Regional Performance Optimization
+**Geographic Routing**: Implementation of region-specific endpoint selection for Chinese market optimization
+**Latency Management**: Network performance optimization for aggregator platform access
+**Compliance Considerations**: Regional data handling and regulatory compliance integration
+**Monitoring Enhancement**: Regional performance metrics and service availability tracking
+
+### 4. Advanced Model Access Framework
+**Preview Model Access**: Technical implementation for cutting-edge model access through aggregator partnerships
+**Model Lifecycle Management**: Handling of model availability changes and deprecation within aggregator context
+**API Version Compatibility**: Management of multiple API versions within single aggregator integration
+**Quality Assurance**: Testing framework for aggregator-provided advanced model capabilities
+
+### 5. Development and Testing Requirements
+**API Investigation**: Deep technical investigation of CodeCMD's API documentation and integration patterns
+**Authentication Testing**: Authentication flow testing and credential management integration
+**Performance Benchmarking**: Comparative performance analysis across CodeCMD's model offerings
+**Integration Testing**: Comprehensive testing of fallback mechanisms with aggregator platform participation

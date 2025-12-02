@@ -144,3 +144,30 @@
 - Strategic roadmap and milestone definitions
 - Partnership development framework
 - User experience optimization strategy
+
+## New Strategic Priority: CodeCMD Platform Integration
+
+### 🎯 Current Focus (Immediate - Next 30 Days)
+**Primary Task**: CodeCMD platform technical investigation and integration planning
+**Status**: Strategic opportunity identification - technical investigation required
+**Requirements**: API discovery, authentication pattern analysis, multi-model routing implementation
+**Strategic Value**: Market expansion through aggregator partnership, advanced model access differentiation
+
+### 🎯 Technical Integration Requirements
+**API Investigation**: CodeCMD platform endpoint discovery and authentication flow analysis
+**Model Support**: Integration of Claude Opus 4.5, GPT-5-Codex, Gemini 3 Pro, Factory Sonnet 4
+**Architecture Enhancement**: Extension of existing fallback framework to support aggregator platforms
+**Regional Optimization**: Chinese market performance optimization through CodeCMD's regional infrastructure
+
+### 🎯 Implementation Strategy
+**Phase 1**: Technical investigation and API documentation discovery
+**Phase 2**: Authentication pattern analysis and credential management integration
+**Phase 3**: Multi-model routing implementation within existing abstraction layer
+**Phase 4**: Regional performance optimization and compliance considerations
+**Phase 5**: Advanced model access framework development and testing
+
+### 🎯 Business Model Enhancement
+**Market Expansion**: Chinese market entry through established aggregator platform
+**Competitive Differentiation**: Early access to cutting-edge models (GPT-5-Codex, Factory Sonnet 4)
+**Partnership Revenue**: Potential aggregator referral model and revenue sharing opportunities
+**Ecosystem Positioning**: Enhanced platform positioning through multi-aggregator support framework

@@ -88,6 +88,12 @@ ccm() {
     return 1
   fi
 
+  # Subcommands that should NOT be eval'd (they print human-readable output)
+  if { [[ "\${1:-}" == "ag" ]] || [[ "\${1:-}" == "antigravity" ]]; } && [[ "\${2:-}" == "health" ]]; then
+    "\$script" "\$@"
+    return $?
+  fi
+
   # All commands use eval to apply environment variables
   case "\$1" in
     ""|"help"|"-h"|"--help"|"status"|"st"|"config"|"cfg"|"save-account"|"switch-account"|"list-accounts"|"delete-account"|"current-account"|"debug-keychain")

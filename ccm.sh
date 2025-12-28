@@ -1316,8 +1316,29 @@ antigravity_health_check() {
     echo -e "${RED}❌ Antigravity gateway unhealthy (HTTP ${http_code})${NC}" >&2
     echo "   URL: $base_url" >&2
     echo "   Model: $model" >&2
-    echo "   Response (first 800 chars):" >&2
-    head -c 800 "$tmp" >&2 || true
+    echo "   Response (first 800 chars, sanitized):" >&2
+    if command -v python3 >/dev/null 2>&1; then
+        python3 - "$tmp" <<'PY' >&2 || true
+import sys
+
+path = sys.argv[1]
+data = open(path, 'rb').read(8000)
+text = data.decode('utf-8', errors='replace')
+
+# Drop control chars except tab/newline/carriage-return to avoid garbled output
+safe = []
+for ch in text:
+    o = ord(ch)
+    if ch in ('\t', '\n', '\r'):
+        safe.append(ch)
+    elif 32 <= o != 127:
+        safe.append(ch)
+
+sys.stderr.write(''.join(safe)[:800])
+PY
+    else
+        LC_ALL=C tr -cd '\11\12\15\40-\176' < "$tmp" | head -c 800 >&2 || true
+    fi
     echo "" >&2
     rm -f "$tmp"
     return 1

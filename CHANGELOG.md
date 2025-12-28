@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- 🚦 **Antigravity Tools gateway source**: `ccm ag` / `ccm antigravity` (Anthropic-compatible gateway)
+  - Config via `ANTIGRAVITY_BASE_URL` (default `http://127.0.0.1:8045`) and `ANTIGRAVITY_API_KEY`
+- 🩺 **Gateway health check**: `ccm ag health`
+
+### Fixed
+- Avoid garbled output in `ccm ag health` by sanitizing response and improving HTTP 000 error hints
+
 ## [2.2.0] - 2025-10-27
 
 ### Added - Claude Pro Account Management 🔐

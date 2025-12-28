@@ -53,6 +53,7 @@ ccc deepseek     # Launch Claude Code with DeepSeek
 | 🌊 **StreamLake (KAT)** | ✅ KAT-Coder | ❌ Official only | StreamLake AI |
 | 🐪 **Qwen** | ✅ qwen3-max (Alibaba DashScope) | ✅ qwen3-next-80b-a3b-thinking | Alibaba Cloud official |
 | 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | Zhipu AI |
+| 🚦 **Antigravity Gateway** | ✅ Anthropic-compatible gateway | ❌ N/A | Local gateway (Antigravity Tools), configurable via `ANTIGRAVITY_BASE_URL` |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ Official only | Balanced performance |
 | 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ Official only | Strongest reasoning |
 | 🔷 **Claude Haiku 4.5** | ✅ claude-haiku-4-5 | ❌ Official only | Fast and efficient |
@@ -167,6 +168,10 @@ QWEN_MODEL=qwen3-max
 GLM_MODEL=glm-4.6
 CLAUDE_MODEL=claude-sonnet-4-5-20250929
 OPUS_MODEL=claude-opus-4-1-20250805
+
+# Antigravity Tools gateway (Anthropic-compatible)
+ANTIGRAVITY_BASE_URL=http://127.0.0.1:8045
+ANTIGRAVITY_API_KEY=sk-antigravity
 
 # Fallback service (only enabled when official keys are missing)
 PPINFRA_API_KEY=your-ppinfra-api-key
@@ -313,6 +318,8 @@ ccm qwen          # Switch to Qwen
 ccm kat           # Switch to StreamLake (KAT)
 ccm glm           # Switch to GLM4.6
 ccm longcat       # Switch to LongCat
+ccm ag            # Switch to Antigravity gateway
+ccm ag health     # Check Antigravity gateway health
 ccm claude        # Switch to Claude Sonnet 4.5
 ccm opus          # Switch to Claude Opus 4.1
 ccm haiku         # Switch to Claude Haiku 4.5
@@ -331,6 +338,7 @@ ccc seed          # Switch to Seed-Code and launch
 ccc pp glm        # Switch to PPINFRA GLM and launch
 ccc opus          # Switch to Claude Opus and launch
 ccc kat           # Switch to StreamLake (KAT) and launch
+ccc ag            # Switch to Antigravity gateway and launch
 
 # Utility commands
 ccm status        # View current status (masked)

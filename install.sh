@@ -88,6 +88,12 @@ ccm() {
     return 1
   fi
 
+  # Subcommands that should NOT be eval'd (they print human-readable output)
+  if { [[ "\${1:-}" == "ag" ]] || [[ "\${1:-}" == "antigravity" ]]; } && [[ "\${2:-}" == "health" ]]; then
+    "\$script" "\$@"
+    return $?
+  fi
+
   # All commands use eval to apply environment variables
   case "\$1" in
     ""|"help"|"-h"|"--help"|"status"|"st"|"config"|"cfg"|"save-account"|"switch-account"|"list-accounts"|"delete-account"|"current-account"|"debug-keychain")
@@ -119,7 +125,7 @@ ccc() {
     echo "  ccc glm --dangerously-skip-permissions    # Launch GLM with options"
     echo ""
     echo "Available models:"
-    echo "  Official: deepseek, glm, kimi, qwen, claude, opus, haiku, longcat"
+    echo "  Official: deepseek, glm, kimi, qwen, claude, opus, haiku, longcat, antigravity"
     echo "  PPINFRA:  pp deepseek, pp glm, pp kimi, pp qwen"
     echo "  Account:  <account> | claude:<account> | opus:<account> | haiku:<account>"
     return 1
@@ -146,7 +152,7 @@ ccc() {
   # Helper: known model keyword
   _is_known_model() {
     case "\$1" in
-      deepseek|ds|glm|glm4|glm4.6|cc|codecmd|kimi|kimi2|qwen|longcat|lc|minimax|mm|claude|sonnet|s|opus|o|haiku|h)
+      deepseek|ds|glm|glm4|glm4.6|cc|codecmd|antigravity|ag|kimi|kimi2|qwen|longcat|lc|minimax|mm|claude|sonnet|s|opus|o|haiku|h)
         return 0 ;;
       *)
         return 1 ;;

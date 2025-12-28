@@ -1687,7 +1687,7 @@ emit_env_exports() {
             fi
             ;;
         *)
-            echo "# $(t 'usage'): $(basename "$0") env [deepseek|kimi|qwen|glm|claude|opus|minimax|kat]" 1>&2
+            echo "# $(t 'usage'): $(basename "$0") env [deepseek|kimi|qwen|glm|claude|opus|minimax|kat|antigravity]" 1>&2
             return 1
             ;;
     esac

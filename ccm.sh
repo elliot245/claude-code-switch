@@ -108,79 +108,8 @@ load_config() {
 
     # 创建配置文件（如果不存在）
     if [[ ! -f "$CONFIG_FILE" ]]; then
-        cat > "$CONFIG_FILE" << 'EOF'
-# CCM 配置文件
-# 请替换为你的实际API密钥
-# 注意：环境变量中的API密钥优先级高于此文件
-
-# 语言设置 (en: English, zh: 中文)
-CCM_LANGUAGE=en
-
-# Deepseek
-DEEPSEEK_API_KEY=sk-your-deepseek-api-key
-
-# GLM4.6 (智谱清言)
-GLM_API_KEY=your-glm-api-key
-
-# KIMI for Coding (月之暗面)
-KIMI_API_KEY=your-kimi-api-key
-
-# LongCat（美团）
-LONGCAT_API_KEY=your-longcat-api-key
-
-# MiniMax M2
-MINIMAX_API_KEY=your-minimax-api-key
-
-# 豆包 Seed-Code (字节跳动)
-ARK_API_KEY=your-ark-api-key
-
-# Qwen（阿里云 DashScope）
-QWEN_API_KEY=your-qwen-api-key
-
-# CodeCMD (支持 Claude Opus 4.5, GPT-5-Codex, Gemini 3 Pro, Factory Sonnet 4)
-CODECMD_API_KEY=your-codecmd-api-key
-
-# Claude (如果使用API key而非Pro订阅)
-CLAUDE_API_KEY=your-claude-api-key
-
-# Antigravity Tools (网关地址可通过 ANTIGRAVITY_BASE_URL 配置，默认 127.0.0.1:8045)
-ANTIGRAVITY_API_KEY=sk-antigravity
-ANTIGRAVITY_BASE_URL=http://127.0.0.1:8045
-
-# 备用提供商（仅当且仅当官方密钥未提供时启用）
-PPINFRA_API_KEY=your-ppinfra-api-key
-
-# —— 可选：模型ID覆盖（不设置则使用下方默认）——
-DEEPSEEK_MODEL=deepseek-chat
-DEEPSEEK_SMALL_FAST_MODEL=deepseek-chat
-KIMI_MODEL=kimi-for-coding
-KIMI_SMALL_FAST_MODEL=kimi-for-coding
-KIMI_CN_MODEL=kimi-k2-thinking
-KIMI_CN_SMALL_FAST_MODEL=kimi-k2-thinking
-QWEN_MODEL=qwen3-max
-QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-instruct
-GLM_MODEL=glm-4.6
-GLM_SMALL_FAST_MODEL=glm-4.5-air
-CLAUDE_MODEL=claude-sonnet-4-5-20250929
-CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
-ANTIGRAVITY_MODEL=claude-sonnet-4-5-20250929
-ANTIGRAVITY_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
-OPUS_MODEL=claude-opus-4-1-20250805
-OPUS_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
-HAIKU_MODEL=claude-haiku-4-5
-HAIKU_SMALL_FAST_MODEL=claude-haiku-4-5
-LONGCAT_MODEL=LongCat-Flash-Thinking
-LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
-MINIMAX_MODEL=MiniMax-M2
-MINIMAX_SMALL_FAST_MODEL=MiniMax-M2
-SEED_MODEL=doubao-seed-code-preview-latest
-SEED_SMALL_FAST_MODEL=doubao-seed-code-preview-latest
-CODECMD_MODEL=claude-sonnet-4-5-20250929
-CODECMD_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
-
-EOF
-        echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}" >&2
-        echo -e "${YELLOW}   $(t 'edit_file_to_add_keys')${NC}" >&2
+        # Keep the default template in ONE place to avoid drift.
+        create_default_config
         echo -e "${GREEN}🚀 Using default experience keys for now...${NC}" >&2
         # Don't return 1 - continue with default fallback keys
     fi
@@ -309,7 +238,7 @@ MINIMAX_SMALL_FAST_MODEL=MiniMax-M2
 SEED_MODEL=doubao-seed-code-preview-latest
 SEED_SMALL_FAST_MODEL=doubao-seed-code-preview-latest
 CODECMD_MODEL=claude-sonnet-4-5-20250929
-CODECMD_SMALL_FAST_MODEL=claude-haiku-4-5
+CODECMD_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 
 EOF
     echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}" >&2
@@ -1283,13 +1212,16 @@ antigravity_health_check() {
     fi
 
     local tmp
+    local curl_err
     tmp="$(mktemp)"
+    curl_err="$(mktemp)"
 
     # Minimal Anthropic Messages request
     local payload
     payload=$(printf '{"model":"%s","max_tokens":16,"messages":[{"role":"user","content":"ping"}]}' "$model")
 
     local http_code=""
+    local curl_rc=0
     http_code=$(curl -sS -m 10 \
         -o "$tmp" \
         -w "%{http_code}" \
@@ -1297,50 +1229,45 @@ antigravity_health_check() {
         -H "x-api-key: ${api_key}" \
         -H "anthropic-version: 2023-06-01" \
         -d "$payload" \
-        "$url" 2>/dev/null || true)
+        "$url" 2>"$curl_err")
+    curl_rc=$?
 
-    if [[ -z "$http_code" ]]; then
+    # curl uses 000 for connection-level failures; keep curl_rc to clarify the cause.
+    if [[ -z "$http_code" || "$curl_rc" -ne 0 ]]; then
         http_code="000"
     fi
 
     if [[ "$http_code" == "200" || "$http_code" == "201" ]]; then
         if grep -q '"type"[[:space:]]*:[[:space:]]*"message"' "$tmp" 2>/dev/null || grep -q '"content"' "$tmp" 2>/dev/null; then
-            echo -e "${GREEN}✅ Antigravity gateway healthy${NC}"
+            echo -e "${GREEN}✅ $(t 'ag_health_healthy' 'Antigravity gateway healthy')${NC}"
             echo "   URL: $base_url"
             echo "   Model: $model"
             rm -f "$tmp"
+            rm -f "$curl_err"
             return 0
         fi
     fi
 
-    echo -e "${RED}❌ Antigravity gateway unhealthy (HTTP ${http_code})${NC}" >&2
+    local curl_hint=""
+    if [[ "$http_code" == "000" ]]; then
+        case "$curl_rc" in
+            6) curl_hint=" (DNS lookup failed)" ;;
+            7) curl_hint=" (connection failed)" ;;
+            28) curl_hint=" (timeout)" ;;
+            0) curl_hint="" ;;
+            *) curl_hint=" (curl exit $curl_rc)" ;;
+        esac
+    fi
+
+    echo -e "${RED}❌ $(t 'ag_health_unhealthy' 'Antigravity gateway unhealthy') (HTTP ${http_code}${curl_hint})${NC}" >&2
     echo "   URL: $base_url" >&2
     echo "   Model: $model" >&2
-    echo "   Response (first 800 chars, sanitized):" >&2
-    if command -v python3 >/dev/null 2>&1; then
-        python3 - "$tmp" <<'PY' >&2 || true
-import sys
-
-path = sys.argv[1]
-data = open(path, 'rb').read(8000)
-text = data.decode('utf-8', errors='replace')
-
-# Drop control chars except tab/newline/carriage-return to avoid garbled output
-safe = []
-for ch in text:
-    o = ord(ch)
-    if ch in ('\t', '\n', '\r'):
-        safe.append(ch)
-    elif 32 <= o != 127:
-        safe.append(ch)
-
-sys.stderr.write(''.join(safe)[:800])
-PY
-    else
-        LC_ALL=C tr -cd '\11\12\15\40-\176' < "$tmp" | head -c 800 >&2 || true
-    fi
+    echo "   $(t 'ag_health_response_sanitized' 'Response (first 800 chars, sanitized):')" >&2
+    # Keep output stable and safe for terminals: ASCII-printables + whitespace only.
+    LC_ALL=C tr -cd '\11\12\15\40-\176' < "$tmp" | head -c 800 >&2 || true
     echo "" >&2
     rm -f "$tmp"
+    rm -f "$curl_err"
     return 1
 }
 

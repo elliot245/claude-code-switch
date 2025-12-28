@@ -90,5 +90,8 @@
   "account_name": "Account name",
   "token_expires": "Token expires at",
   "access_token": "Access token",
-  "account": "Account"
+  "account": "Account",
+  "ag_health_healthy": "Antigravity gateway healthy",
+  "ag_health_unhealthy": "Antigravity gateway unhealthy",
+  "ag_health_response_sanitized": "Response (first 800 chars, sanitized):"
 }

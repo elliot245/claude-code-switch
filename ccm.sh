@@ -143,6 +143,10 @@ CODECMD_API_KEY=your-codecmd-api-key
 # Claude (如果使用API key而非Pro订阅)
 CLAUDE_API_KEY=your-claude-api-key
 
+# Antigravity Tools (网关地址可通过 ANTIGRAVITY_BASE_URL 配置，默认 127.0.0.1:8045)
+ANTIGRAVITY_API_KEY=sk-antigravity
+ANTIGRAVITY_BASE_URL=http://127.0.0.1:8045
+
 # 备用提供商（仅当且仅当官方密钥未提供时启用）
 PPINFRA_API_KEY=your-ppinfra-api-key
 
@@ -159,6 +163,8 @@ GLM_MODEL=glm-4.6
 GLM_SMALL_FAST_MODEL=glm-4.5-air
 CLAUDE_MODEL=claude-sonnet-4-5-20250929
 CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
+ANTIGRAVITY_MODEL=claude-sonnet-4-5-20250929
+ANTIGRAVITY_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 OPUS_MODEL=claude-opus-4-1-20250805
 OPUS_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 HAIKU_MODEL=claude-haiku-4-5
@@ -270,6 +276,10 @@ CODECMD_API_KEY=your-codecmd-api-key
 # Claude (如果使用API key而非Pro订阅)
 CLAUDE_API_KEY=your-claude-api-key
 
+# Antigravity Tools (网关地址可通过 ANTIGRAVITY_BASE_URL 配置，默认 127.0.0.1:8045)
+ANTIGRAVITY_API_KEY=sk-antigravity
+ANTIGRAVITY_BASE_URL=http://127.0.0.1:8045
+
 # 备用提供商（仅当且仅当官方密钥未提供时启用）
 PPINFRA_API_KEY=your-ppinfra-api-key
 
@@ -286,6 +296,8 @@ GLM_MODEL=glm-4.6
 GLM_SMALL_FAST_MODEL=glm-4.5-air
 CLAUDE_MODEL=claude-sonnet-4-5-20250929
 CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
+ANTIGRAVITY_MODEL=claude-sonnet-4-5-20250929
+ANTIGRAVITY_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 OPUS_MODEL=claude-opus-4-1-20250805
 OPUS_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 HAIKU_MODEL=claude-haiku-4-5
@@ -696,6 +708,8 @@ show_status() {
     echo "   ARK_API_KEY: $(mask_presence ARK_API_KEY)"
     echo "   QWEN_API_KEY: $(mask_presence QWEN_API_KEY)"
     echo "   PPINFRA_API_KEY: $(mask_presence PPINFRA_API_KEY)"
+    echo "   ANTIGRAVITY_API_KEY: $(mask_presence ANTIGRAVITY_API_KEY)"
+    echo "   ANTIGRAVITY_BASE_URL: ${ANTIGRAVITY_BASE_URL:-'(unset)'}"
 }
 
 # 清理环境变量
@@ -1205,6 +1219,7 @@ show_help() {
     echo "  qwen               - env qwen"
     echo "  glm, glm4          - env glm"
     echo "  codecmd, cc        - env codecmd"
+    echo "  antigravity, ag    - env Antigravity Tools gateway (set ANTIGRAVITY_BASE_URL)"
     echo "  claude, sonnet, s  - env claude"
     echo "  opus, o            - env opus"
     echo "  haiku, h           - env haiku"
@@ -1229,6 +1244,8 @@ show_help() {
     echo -e "${YELLOW}$(t 'examples'):${NC}"
     echo "  eval \"\$(ccm deepseek)\"                   # Apply in current shell (recommended)"
     echo "  eval \"\$(ccm seed)\"                     # Switch to 豆包 Seed-Code with ARK_API_KEY"
+    echo "  eval \"\$(ccm ag)\"                       # Use Antigravity Tools gateway (default http://127.0.0.1:8045)"
+    echo "  ANTIGRAVITY_BASE_URL=\"http://host:8045\" eval \"\$(ccm ag)\""
     echo "  $(basename "$0") status                      # Check current status (masked)"
     echo "  $(basename "$0") save-account work           # Save current account as 'work'"
     echo "  $(basename "$0") opus:personal               # Switch to 'personal' account with Opus"
@@ -1243,6 +1260,7 @@ show_help() {
     echo "  🎯 MiniMax M2          - 官方：MiniMax-M2 ｜ 备用：MiniMax-M2 (PPINFRA)"
     echo "  🐪 Qwen                - 官方：qwen3-max (阿里云) ｜ 备用：qwen3-next-80b-a3b-thinking (PPINFRA)"
     echo "  🇨🇳 GLM4.6             - 官方：glm-4.6 / glm-4.5-air"
+    echo "  🚦 Antigravity Tools   - 网关：\$ANTIGRAVITY_BASE_URL (default http://127.0.0.1:8045)"
     echo "  🧠 Claude Sonnet 4.5   - claude-sonnet-4-5-20250929"
     echo "  🚀 Claude Opus 4.1     - claude-opus-4-1-20250805"
     echo "  🔷 Claude Haiku 4.5    - claude-haiku-4-5"
@@ -1272,6 +1290,8 @@ ensure_model_override_defaults() {
         "GLM_SMALL_FAST_MODEL=glm-4.5-air"
         "CLAUDE_MODEL=claude-sonnet-4-5-20250929"
         "CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929"
+        "ANTIGRAVITY_MODEL=claude-sonnet-4-5-20250929"
+        "ANTIGRAVITY_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929"
         "OPUS_MODEL=claude-opus-4-1-20250805"
         "OPUS_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929"
         "HAIKU_MODEL=claude-haiku-4-5"
@@ -1526,6 +1546,19 @@ emit_env_exports() {
                 return 1
             fi
             ;;
+        "antigravity"|"ag")
+            echo "$prelude"
+            echo "export API_TIMEOUT_MS='600000'"
+            echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
+            echo "if { [ -z \"\${ANTIGRAVITY_API_KEY}\" ] || [ -z \"\${ANTIGRAVITY_BASE_URL}\" ]; } && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
+            echo "export ANTHROPIC_BASE_URL=\"\${ANTIGRAVITY_BASE_URL:-http://127.0.0.1:8045}\""
+            echo "export ANTHROPIC_API_URL=\"\${ANTIGRAVITY_BASE_URL:-http://127.0.0.1:8045}\""
+            echo "export ANTHROPIC_AUTH_TOKEN=\"\${ANTIGRAVITY_API_KEY:-sk-antigravity}\""
+            local ag_model="${ANTIGRAVITY_MODEL:-claude-sonnet-4-5-20250929}"
+            local ag_small="${ANTIGRAVITY_SMALL_FAST_MODEL:-claude-sonnet-4-5-20250929}"
+            echo "export ANTHROPIC_MODEL='${ag_model}'"
+            echo "export ANTHROPIC_SMALL_FAST_MODEL='${ag_small}'"
+            ;;
         "claude"|"sonnet"|"s")
             echo "$prelude"
             # 官方 Anthropic 默认网关，无需设置 BASE_URL
@@ -1747,6 +1780,9 @@ main() {
             ;;
         "codecmd"|"cc")
             emit_env_exports codecmd
+            ;;
+        "antigravity"|"ag")
+            emit_env_exports antigravity
             ;;
         "claude"|"sonnet"|"s")
             emit_env_exports claude

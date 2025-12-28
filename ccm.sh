@@ -1246,6 +1246,7 @@ show_help() {
     echo "  eval \"\$(ccm seed)\"                     # Switch to 豆包 Seed-Code with ARK_API_KEY"
     echo "  eval \"\$(ccm ag)\"                       # Use Antigravity Tools gateway (default http://127.0.0.1:8045)"
     echo "  ANTIGRAVITY_BASE_URL=\"http://host:8045\" eval \"\$(ccm ag)\""
+    echo "  ccm ag health                             # Check Antigravity gateway health"
     echo "  $(basename "$0") status                      # Check current status (masked)"
     echo "  $(basename "$0") save-account work           # Save current account as 'work'"
     echo "  $(basename "$0") opus:personal               # Switch to 'personal' account with Opus"
@@ -1264,6 +1265,62 @@ show_help() {
     echo "  🧠 Claude Sonnet 4.5   - claude-sonnet-4-5-20250929"
     echo "  🚀 Claude Opus 4.1     - claude-opus-4-1-20250805"
     echo "  🔷 Claude Haiku 4.5    - claude-haiku-4-5"
+}
+
+# Antigravity Tools 网关健康检查
+antigravity_health_check() {
+    # Ensure config/env is loaded
+    load_config || return 1
+
+    local base_url="${ANTIGRAVITY_BASE_URL:-http://127.0.0.1:8045}"
+    local api_key="${ANTIGRAVITY_API_KEY:-sk-antigravity}"
+    local model="${ANTIGRAVITY_MODEL:-claude-sonnet-4-5-20250929}"
+    local url="${base_url%/}/v1/messages"
+
+    if ! command -v curl >/dev/null 2>&1; then
+        echo -e "${RED}❌ health check requires curl${NC}" >&2
+        return 1
+    fi
+
+    local tmp
+    tmp="$(mktemp)"
+
+    # Minimal Anthropic Messages request
+    local payload
+    payload=$(printf '{"model":"%s","max_tokens":16,"messages":[{"role":"user","content":"ping"}]}' "$model")
+
+    local http_code=""
+    http_code=$(curl -sS -m 10 \
+        -o "$tmp" \
+        -w "%{http_code}" \
+        -H "content-type: application/json" \
+        -H "x-api-key: ${api_key}" \
+        -H "anthropic-version: 2023-06-01" \
+        -d "$payload" \
+        "$url" 2>/dev/null || true)
+
+    if [[ -z "$http_code" ]]; then
+        http_code="000"
+    fi
+
+    if [[ "$http_code" == "200" || "$http_code" == "201" ]]; then
+        if grep -q '"type"[[:space:]]*:[[:space:]]*"message"' "$tmp" 2>/dev/null || grep -q '"content"' "$tmp" 2>/dev/null; then
+            echo -e "${GREEN}✅ Antigravity gateway healthy${NC}"
+            echo "   URL: $base_url"
+            echo "   Model: $model"
+            rm -f "$tmp"
+            return 0
+        fi
+    fi
+
+    echo -e "${RED}❌ Antigravity gateway unhealthy (HTTP ${http_code})${NC}" >&2
+    echo "   URL: $base_url" >&2
+    echo "   Model: $model" >&2
+    echo "   Response (first 800 chars):" >&2
+    head -c 800 "$tmp" >&2 || true
+    echo "" >&2
+    rm -f "$tmp"
+    return 1
 }
 
 # 将缺失的模型ID覆盖项追加到配置文件（仅追加缺失项，不覆盖已存在的配置）
@@ -1782,7 +1839,11 @@ main() {
             emit_env_exports codecmd
             ;;
         "antigravity"|"ag")
-            emit_env_exports antigravity
+            if [[ "${2:-}" == "health" ]]; then
+                antigravity_health_check
+            else
+                emit_env_exports antigravity
+            fi
             ;;
         "claude"|"sonnet"|"s")
             emit_env_exports claude

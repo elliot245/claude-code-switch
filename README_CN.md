@@ -186,6 +186,10 @@ CLIPROXY_OPUS_MODEL=claude-opus-4-1-20250805
 CLIPROXY_SONNET_MODEL=claude-sonnet-4-5-20250929
 CLIPROXY_HAIKU_MODEL=claude-3-5-haiku-20241022
 
+# CLIProxyAPI 本地代理（Anthropic 兼容）
+CLIPROXY_BASE_URL=http://127.0.0.1:8317
+CLIPROXY_API_KEY=sk-cliproxy
+
 # 备用服务（仅当官方密钥缺失时启用）
 PPINFRA_API_KEY=your-ppinfra-api-key
 ```

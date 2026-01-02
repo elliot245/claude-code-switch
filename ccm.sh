@@ -1617,7 +1617,7 @@ emit_env_exports() {
             echo "$prelude"
             echo "export API_TIMEOUT_MS='600000'"
             echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
-            echo "if { [ -z \"\${CLIPROXY_API_KEY}\" ] || [ -z \"\${CLIPROXY_BASE_URL}\" ]; } && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
+            echo "if { [ -z \"\${CLIPROXY_API_KEY:-}\" ] || [ -z \"\${CLIPROXY_BASE_URL:-}\" ]; } && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
             echo "export ANTHROPIC_BASE_URL=\"\${CLIPROXY_BASE_URL:-http://127.0.0.1:8317}\""
             echo "export ANTHROPIC_API_URL=\"\${CLIPROXY_BASE_URL:-http://127.0.0.1:8317}\""
             echo "export ANTHROPIC_AUTH_TOKEN=\"\${CLIPROXY_API_KEY:-sk-cliproxy}\""

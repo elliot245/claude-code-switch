@@ -54,6 +54,7 @@ ccc deepseek     # Launch Claude Code with DeepSeek
 | 🐪 **Qwen** | ✅ qwen3-max (Alibaba DashScope) | ✅ qwen3-next-80b-a3b-thinking | Alibaba Cloud official |
 | 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | Zhipu AI |
 | 🚦 **Antigravity Gateway** | ✅ Anthropic-compatible gateway | ❌ N/A | Local gateway (Antigravity Tools), configurable via `ANTIGRAVITY_BASE_URL` |
+| 🔌 **CLIProxyAPI** | ✅ Anthropic-compatible proxy | ❌ N/A | Local proxy ([CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI)), configurable via `CLIPROXY_BASE_URL` |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ Official only | Balanced performance |
 | 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ Official only | Strongest reasoning |
 | 🔷 **Claude Haiku 4.5** | ✅ claude-haiku-4-5 | ❌ Official only | Fast and efficient |
@@ -172,6 +173,18 @@ OPUS_MODEL=claude-opus-4-1-20250805
 # Antigravity Tools gateway (Anthropic-compatible)
 ANTIGRAVITY_BASE_URL=http://127.0.0.1:8045
 ANTIGRAVITY_API_KEY=sk-antigravity
+ANTIGRAVITY_MODEL=claude-sonnet-4-5-20250929  # Optional model override
+
+# CLIProxyAPI local proxy (Anthropic-compatible)
+CLIPROXY_BASE_URL=http://127.0.0.1:8317
+CLIPROXY_API_KEY=sk-cliproxy
+# Claude Code 1.x model overrides
+CLIPROXY_MODEL=claude-sonnet-4-5-20250929  # Optional model override
+CLIPROXY_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
+# Claude Code 2.x model overrides
+CLIPROXY_OPUS_MODEL=claude-opus-4-1-20250805
+CLIPROXY_SONNET_MODEL=claude-sonnet-4-5-20250929
+CLIPROXY_HAIKU_MODEL=claude-3-5-haiku-20241022
 
 # Fallback service (only enabled when official keys are missing)
 PPINFRA_API_KEY=your-ppinfra-api-key
@@ -320,6 +333,7 @@ ccm glm           # Switch to GLM4.6
 ccm longcat       # Switch to LongCat
 ccm ag            # Switch to Antigravity gateway
 ccm ag health     # Check Antigravity gateway health
+ccm cp            # Switch to CLIProxyAPI local proxy
 ccm claude        # Switch to Claude Sonnet 4.5
 ccm opus          # Switch to Claude Opus 4.1
 ccm haiku         # Switch to Claude Haiku 4.5
@@ -339,6 +353,7 @@ ccc pp glm        # Switch to PPINFRA GLM and launch
 ccc opus          # Switch to Claude Opus and launch
 ccc kat           # Switch to StreamLake (KAT) and launch
 ccc ag            # Switch to Antigravity gateway and launch
+ccc cp            # Switch to CLIProxyAPI local proxy and launch
 
 # Utility commands
 ccm status        # View current status (masked)

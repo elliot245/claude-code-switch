@@ -6,6 +6,9 @@
 - 🚦 **Antigravity Tools gateway source**: `ccm ag` / `ccm antigravity` (Anthropic-compatible gateway)
   - Config via `ANTIGRAVITY_BASE_URL` (default `http://127.0.0.1:8045`) and `ANTIGRAVITY_API_KEY`
 - 🩺 **Gateway health check**: `ccm ag health`
+- 🔌 **CLIProxyAPI local proxy source**: `ccm cp` / `ccm cliproxy` (Anthropic-compatible local proxy)
+  - Config via `CLIPROXY_BASE_URL` (default `http://127.0.0.1:8317`) and `CLIPROXY_API_KEY`
+  - Wraps AI CLI tools (Gemini CLI, Claude Code, etc.) as Claude-compatible API
 
 ### Fixed
 - Avoid garbled output in `ccm ag health` by sanitizing response and improving HTTP 000 error hints

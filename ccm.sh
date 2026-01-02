@@ -209,6 +209,10 @@ CLAUDE_API_KEY=your-claude-api-key
 ANTIGRAVITY_API_KEY=sk-antigravity
 ANTIGRAVITY_BASE_URL=http://127.0.0.1:8045
 
+# CLIProxyAPI (本地代理服务，默认端口 8317)
+CLIPROXY_API_KEY=sk-cliproxy
+CLIPROXY_BASE_URL=http://127.0.0.1:8317
+
 # 备用提供商（仅当且仅当官方密钥未提供时启用）
 PPINFRA_API_KEY=your-ppinfra-api-key
 
@@ -227,6 +231,11 @@ CLAUDE_MODEL=claude-sonnet-4-5-20250929
 CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 ANTIGRAVITY_MODEL=claude-sonnet-4-5-20250929
 ANTIGRAVITY_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
+CLIPROXY_MODEL=claude-sonnet-4-5-20250929
+CLIPROXY_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
+CLIPROXY_OPUS_MODEL=claude-opus-4-1-20250805
+CLIPROXY_SONNET_MODEL=claude-sonnet-4-5-20250929
+CLIPROXY_HAIKU_MODEL=claude-3-5-haiku-20241022
 OPUS_MODEL=claude-opus-4-1-20250805
 OPUS_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 HAIKU_MODEL=claude-haiku-4-5
@@ -1007,6 +1016,38 @@ switch_to_kat() {
     echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
 }
 
+# 切换到 CLIProxyAPI (本地代理)
+switch_to_cliproxy() {
+    echo -e "${YELLOW}🔄 $(t 'switching_to') CLIProxyAPI $(t 'model')...${NC}"
+    clean_env
+    # CLIProxyAPI 是本地运行的代理，默认端口 8317
+    local base_url="${CLIPROXY_BASE_URL:-http://127.0.0.1:8317}"
+    local api_key="${CLIPROXY_API_KEY:-sk-cliproxy}"
+    export ANTHROPIC_BASE_URL="$base_url"
+    export ANTHROPIC_API_URL="$base_url"
+    export ANTHROPIC_AUTH_TOKEN="$api_key"
+    export ANTHROPIC_API_KEY="$api_key"
+    # Claude Code 1.x variables
+    local cliproxy_model="${CLIPROXY_MODEL:-claude-sonnet-4-5-20250929}"
+    local cliproxy_small="${CLIPROXY_SMALL_FAST_MODEL:-claude-sonnet-4-5-20250929}"
+    export ANTHROPIC_MODEL="$cliproxy_model"
+    export ANTHROPIC_SMALL_FAST_MODEL="$cliproxy_small"
+    # Claude Code 2.x variables
+    local cliproxy_opus="${CLIPROXY_OPUS_MODEL:-claude-opus-4-1-20250805}"
+    local cliproxy_sonnet="${CLIPROXY_SONNET_MODEL:-claude-sonnet-4-5-20250929}"
+    local cliproxy_haiku="${CLIPROXY_HAIKU_MODEL:-claude-3-5-haiku-20241022}"
+    export ANTHROPIC_DEFAULT_OPUS_MODEL="$cliproxy_opus"
+    export ANTHROPIC_DEFAULT_SONNET_MODEL="$cliproxy_sonnet"
+    export ANTHROPIC_DEFAULT_HAIKU_MODEL="$cliproxy_haiku"
+    echo -e "${GREEN}✅ $(t 'switched_to') CLIProxyAPI${NC}"
+    echo "   BASE_URL: $ANTHROPIC_BASE_URL"
+    echo "   MODEL: $ANTHROPIC_MODEL"
+    echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
+    echo "   OPUS: $ANTHROPIC_DEFAULT_OPUS_MODEL"
+    echo "   SONNET: $ANTHROPIC_DEFAULT_SONNET_MODEL"
+    echo "   HAIKU: $ANTHROPIC_DEFAULT_HAIKU_MODEL"
+}
+
 # 切换到PPINFRA服务
 switch_to_ppinfra() {
     local target="${1:-}"
@@ -1149,6 +1190,7 @@ show_help() {
     echo "  glm, glm4          - env glm"
     echo "  codecmd, cc        - env codecmd"
     echo "  antigravity, ag    - env Antigravity Tools gateway (set ANTIGRAVITY_BASE_URL)"
+    echo "  cliproxy, cp       - env CLIProxyAPI local proxy (set CLIPROXY_BASE_URL, default 127.0.0.1:8317)"
     echo "  claude, sonnet, s  - env claude"
     echo "  opus, o            - env opus"
     echo "  haiku, h           - env haiku"
@@ -1174,6 +1216,7 @@ show_help() {
     echo "  eval \"\$(ccm deepseek)\"                   # Apply in current shell (recommended)"
     echo "  eval \"\$(ccm seed)\"                     # Switch to 豆包 Seed-Code with ARK_API_KEY"
     echo "  eval \"\$(ccm ag)\"                       # Use Antigravity Tools gateway (default http://127.0.0.1:8045)"
+    echo "  eval \"\$(ccm cp)\"                       # Use CLIProxyAPI local proxy (default http://127.0.0.1:8317)"
     echo "  ANTIGRAVITY_BASE_URL=\"http://host:8045\" eval \"\$(ccm ag)\""
     echo "  ccm ag health                             # Check Antigravity gateway health"
     echo "  $(basename "$0") status                      # Check current status (masked)"
@@ -1191,6 +1234,7 @@ show_help() {
     echo "  🐪 Qwen                - 官方：qwen3-max (阿里云) ｜ 备用：qwen3-next-80b-a3b-thinking (PPINFRA)"
     echo "  🇨🇳 GLM4.6             - 官方：glm-4.6 / glm-4.5-air"
     echo "  🚦 Antigravity Tools   - 网关：\$ANTIGRAVITY_BASE_URL (default http://127.0.0.1:8045)"
+    echo "  🔌 CLIProxyAPI         - 本地代理：\$CLIPROXY_BASE_URL (default http://127.0.0.1:8317)"
     echo "  🧠 Claude Sonnet 4.5   - claude-sonnet-4-5-20250929"
     echo "  🚀 Claude Opus 4.1     - claude-opus-4-1-20250805"
     echo "  🔷 Claude Haiku 4.5    - claude-haiku-4-5"
@@ -1297,6 +1341,11 @@ ensure_model_override_defaults() {
         "CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929"
         "ANTIGRAVITY_MODEL=claude-sonnet-4-5-20250929"
         "ANTIGRAVITY_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929"
+        "CLIPROXY_MODEL=claude-sonnet-4-5-20250929"
+        "CLIPROXY_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929"
+        "CLIPROXY_OPUS_MODEL=claude-opus-4-1-20250805"
+        "CLIPROXY_SONNET_MODEL=claude-sonnet-4-5-20250929"
+        "CLIPROXY_HAIKU_MODEL=claude-3-5-haiku-20241022"
         "OPUS_MODEL=claude-opus-4-1-20250805"
         "OPUS_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929"
         "HAIKU_MODEL=claude-haiku-4-5"
@@ -1564,6 +1613,27 @@ emit_env_exports() {
             echo "export ANTHROPIC_MODEL='${ag_model}'"
             echo "export ANTHROPIC_SMALL_FAST_MODEL='${ag_small}'"
             ;;
+        "cliproxy"|"cp")
+            echo "$prelude"
+            echo "export API_TIMEOUT_MS='600000'"
+            echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
+            echo "if { [ -z \"\${CLIPROXY_API_KEY}\" ] || [ -z \"\${CLIPROXY_BASE_URL}\" ]; } && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
+            echo "export ANTHROPIC_BASE_URL=\"\${CLIPROXY_BASE_URL:-http://127.0.0.1:8317}\""
+            echo "export ANTHROPIC_API_URL=\"\${CLIPROXY_BASE_URL:-http://127.0.0.1:8317}\""
+            echo "export ANTHROPIC_AUTH_TOKEN=\"\${CLIPROXY_API_KEY:-sk-cliproxy}\""
+            # Claude Code 1.x variables
+            local cp_model="${CLIPROXY_MODEL:-claude-sonnet-4-5-20250929}"
+            local cp_small="${CLIPROXY_SMALL_FAST_MODEL:-claude-sonnet-4-5-20250929}"
+            echo "export ANTHROPIC_MODEL='${cp_model}'"
+            echo "export ANTHROPIC_SMALL_FAST_MODEL='${cp_small}'"
+            # Claude Code 2.x variables
+            local cp_opus="${CLIPROXY_OPUS_MODEL:-claude-opus-4-1-20250805}"
+            local cp_sonnet="${CLIPROXY_SONNET_MODEL:-claude-sonnet-4-5-20250929}"
+            local cp_haiku="${CLIPROXY_HAIKU_MODEL:-claude-3-5-haiku-20241022}"
+            echo "export ANTHROPIC_DEFAULT_OPUS_MODEL='${cp_opus}'"
+            echo "export ANTHROPIC_DEFAULT_SONNET_MODEL='${cp_sonnet}'"
+            echo "export ANTHROPIC_DEFAULT_HAIKU_MODEL='${cp_haiku}'"
+            ;;
         "claude"|"sonnet"|"s")
             echo "$prelude"
             # 官方 Anthropic 默认网关，无需设置 BASE_URL
@@ -1692,7 +1762,7 @@ emit_env_exports() {
             fi
             ;;
         *)
-            echo "# $(t 'usage'): $(basename "$0") env [deepseek|kimi|qwen|glm|claude|opus|minimax|kat|antigravity]" 1>&2
+            echo "# $(t 'usage'): $(basename "$0") env [deepseek|kimi|qwen|glm|claude|opus|minimax|kat|antigravity|cliproxy]" 1>&2
             return 1
             ;;
     esac
@@ -1792,6 +1862,9 @@ main() {
             else
                 emit_env_exports antigravity
             fi
+            ;;
+        "cliproxy"|"cp")
+            emit_env_exports cliproxy
             ;;
         "claude"|"sonnet"|"s")
             emit_env_exports claude

@@ -54,6 +54,7 @@ ccc deepseek     # 启动 Claude Code with DeepSeek
 | 🐪 **Qwen** | ✅ qwen3-max（阿里云） | ✅ qwen3-next-80b-a3b-thinking | 阿里云官方 |
 | 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | 智谱清言 |
 | 🚦 **Antigravity 网关** | ✅ Anthropic 兼容网关 | ❌ 无 | 本地网关（Antigravity Tools），可通过 `ANTIGRAVITY_BASE_URL` 配置 |
+| 🔌 **CLIProxyAPI** | ✅ Anthropic 兼容代理 | ❌ 无 | 本地代理（[CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI)），可通过 `CLIPROXY_BASE_URL` 配置 |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ 仅官方 | 平衡性能 |
 | 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ 仅官方 | 最强推理 |
 | 🔷 **Claude Haiku 4.5** | ✅ claude-haiku-4-5 | ❌ 仅官方 | 快速高效 |
@@ -172,6 +173,18 @@ OPUS_MODEL=claude-opus-4-1-20250805
 # Antigravity Tools 网关（Anthropic 兼容）
 ANTIGRAVITY_BASE_URL=http://127.0.0.1:8045
 ANTIGRAVITY_API_KEY=sk-antigravity
+ANTIGRAVITY_MODEL=claude-sonnet-4-5-20250929  # 可选模型覆盖
+
+# CLIProxyAPI 本地代理（Anthropic 兼容）
+CLIPROXY_BASE_URL=http://127.0.0.1:8317
+CLIPROXY_API_KEY=sk-cliproxy
+# Claude Code 1.x 模型覆盖
+CLIPROXY_MODEL=claude-sonnet-4-5-20250929  # 可选模型覆盖
+CLIPROXY_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
+# Claude Code 2.x 模型覆盖
+CLIPROXY_OPUS_MODEL=claude-opus-4-1-20250805
+CLIPROXY_SONNET_MODEL=claude-sonnet-4-5-20250929
+CLIPROXY_HAIKU_MODEL=claude-3-5-haiku-20241022
 
 # 备用服务（仅当官方密钥缺失时启用）
 PPINFRA_API_KEY=your-ppinfra-api-key
@@ -319,6 +332,7 @@ ccm glm           # 切换到GLM4.6
 ccm longcat       # 切换到LongCat
 ccm ag            # 切换到 Antigravity 网关
 ccm ag health     # 检查 Antigravity 网关健康
+ccm cp            # 切换到 CLIProxyAPI 本地代理
 ccm claude        # 切换到Claude Sonnet 4.5
 ccm opus          # 切换到Claude Opus 4.1
 ccm haiku         # 切换到Claude Haiku 4.5
@@ -337,6 +351,7 @@ ccc pp glm        # 切换到PPINFRA GLM并启动
 ccc opus          # 切换到Claude Opus并启动
 ccc kat           # 切换到StreamLake (KAT)并启动
 ccc ag            # 切换到 Antigravity 网关并启动
+ccc cp            # 切换到 CLIProxyAPI 本地代理并启动
 
 # 工具命令
 ccm status        # 查看当前状态（脱敏）

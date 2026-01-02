@@ -125,7 +125,7 @@ ccc() {
     echo "  ccc glm --dangerously-skip-permissions    # Launch GLM with options"
     echo ""
     echo "Available models:"
-    echo "  Official: deepseek, glm, kimi, qwen, claude, opus, haiku, longcat, antigravity"
+    echo "  Official: deepseek, glm, kimi, qwen, claude, opus, haiku, longcat, antigravity, cliproxy"
     echo "  PPINFRA:  pp deepseek, pp glm, pp kimi, pp qwen"
     echo "  Account:  <account> | claude:<account> | opus:<account> | haiku:<account>"
     return 1
@@ -152,7 +152,7 @@ ccc() {
   # Helper: known model keyword
   _is_known_model() {
     case "\$1" in
-      deepseek|ds|glm|glm4|glm4.6|cc|codecmd|antigravity|ag|kimi|kimi2|qwen|longcat|lc|minimax|mm|claude|sonnet|s|opus|o|haiku|h)
+      deepseek|ds|glm|glm4|glm4.6|cc|codecmd|antigravity|ag|cliproxy|cp|kimi|kimi2|qwen|longcat|lc|minimax|mm|claude|sonnet|s|opus|o|haiku|h)
         return 0 ;;
       *)
         return 1 ;;

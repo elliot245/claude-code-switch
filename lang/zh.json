@@ -93,5 +93,6 @@
   "account": "账号",
   "ag_health_healthy": "Antigravity 网关健康",
   "ag_health_unhealthy": "Antigravity 网关异常",
-  "ag_health_response_sanitized": "响应（前 800 字符，已清洗）："
+  "ag_health_response_sanitized": "响应（前 800 字符，已清洗）：",
+  "tiger_features": "官方：https://tiger.bookapi.cc"
 }

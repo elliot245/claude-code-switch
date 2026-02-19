@@ -9,6 +9,9 @@
 - 🔌 **CLIProxyAPI local proxy source**: `ccm cp` / `ccm cliproxy` (Anthropic-compatible local proxy)
   - Config via `CLIPROXY_BASE_URL` (default `http://127.0.0.1:8317`) and `CLIPROXY_API_KEY`
   - Wraps AI CLI tools (Gemini CLI, Claude Code, etc.) as Claude-compatible API
+- 🐯 **Tiger BookAPI source**: `ccm tiger` (https://tiger.bookapi.cc)
+  - Config via `TIGER_API_KEY`
+  - Anthropic-compatible API endpoint
 
 ### Fixed
 - Avoid garbled output in `ccm ag health` by sanitizing response and improving HTTP 000 error hints

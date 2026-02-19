@@ -213,6 +213,9 @@ ANTIGRAVITY_BASE_URL=http://127.0.0.1:8045
 CLIPROXY_API_KEY=sk-cliproxy
 CLIPROXY_BASE_URL=http://127.0.0.1:8317
 
+# Tiger BookAPI
+TIGER_API_KEY=your-tiger-api-key
+
 # 备用提供商（仅当且仅当官方密钥未提供时启用）
 PPINFRA_API_KEY=your-ppinfra-api-key
 
@@ -250,6 +253,8 @@ SEED_MODEL=doubao-seed-code-preview-latest
 SEED_SMALL_FAST_MODEL=doubao-seed-code-preview-latest
 CODECMD_MODEL=claude-sonnet-4-5-20250929
 CODECMD_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
+TIGER_MODEL=claude-sonnet-4-5-20250929
+TIGER_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 
 EOF
     echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}" >&2
@@ -647,6 +652,7 @@ show_status() {
     echo "   DEEPSEEK_API_KEY: $(mask_presence DEEPSEEK_API_KEY)"
     echo "   ARK_API_KEY: $(mask_presence ARK_API_KEY)"
     echo "   QWEN_API_KEY: $(mask_presence QWEN_API_KEY)"
+    echo "   TIGER_API_KEY: $(mask_presence TIGER_API_KEY)"
     echo "   PPINFRA_API_KEY: $(mask_presence PPINFRA_API_KEY)"
     echo "   ANTIGRAVITY_API_KEY: $(mask_presence ANTIGRAVITY_API_KEY)"
     echo "   ANTIGRAVITY_BASE_URL: ${ANTIGRAVITY_BASE_URL:-'(unset)'}"
@@ -1018,6 +1024,31 @@ switch_to_kat() {
     echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
 }
 
+# 切换到 Tiger BookAPI
+switch_to_tiger() {
+    echo -e "${YELLOW}🔄 $(t 'switching_to') Tiger $(t 'model')...${NC}"
+    clean_env
+    if is_effectively_set "$TIGER_API_KEY"; then
+        # Tiger BookAPI 端点
+        export ANTHROPIC_BASE_URL="https://tiger.bookapi.cc"
+        export ANTHROPIC_API_URL="https://tiger.bookapi.cc"
+        export ANTHROPIC_AUTH_TOKEN="$TIGER_API_KEY"
+        export ANTHROPIC_API_KEY="$TIGER_API_KEY"
+        # Tiger 默认使用 Claude Sonnet 4.5
+        local tiger_model="${TIGER_MODEL:-claude-sonnet-4-5-20250929}"
+        local tiger_small="${TIGER_SMALL_FAST_MODEL:-claude-sonnet-4-5-20250929}"
+        export ANTHROPIC_MODEL="$tiger_model"
+        export ANTHROPIC_SMALL_FAST_MODEL="$tiger_small"
+        echo -e "${GREEN}✅ $(t 'switched_to') Tiger（$(t 'official')）${NC}"
+    else
+        echo -e "${RED}❌ Please configure TIGER_API_KEY${NC}"
+        return 1
+    fi
+    echo "   BASE_URL: $ANTHROPIC_BASE_URL"
+    echo "   MODEL: $ANTHROPIC_MODEL"
+    echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
+}
+
 # 切换到 CLIProxyAPI (本地代理)
 switch_to_cliproxy() {
     echo -e "${YELLOW}🔄 $(t 'switching_to') CLIProxyAPI $(t 'model')...${NC}"
@@ -1193,6 +1224,7 @@ show_help() {
     echo "  codecmd, cc        - env codecmd"
     echo "  antigravity, ag    - env Antigravity Tools gateway (set ANTIGRAVITY_BASE_URL)"
     echo "  cliproxy, cp       - env CLIProxyAPI local proxy (set CLIPROXY_BASE_URL, default 127.0.0.1:8317)"
+    echo "  tiger              - env Tiger BookAPI (https://tiger.bookapi.cc)"
     echo "  claude, sonnet, s  - env claude"
     echo "  opus, o            - env opus"
     echo "  haiku, h           - env haiku"
@@ -1219,6 +1251,7 @@ show_help() {
     echo "  eval \"\$(ccm seed)\"                     # Switch to 豆包 Seed-Code with ARK_API_KEY"
     echo "  eval \"\$(ccm ag)\"                       # Use Antigravity Tools gateway (default http://127.0.0.1:8045)"
     echo "  eval \"\$(ccm cp)\"                       # Use CLIProxyAPI local proxy (default http://127.0.0.1:8317)"
+    echo "  eval \"\$(ccm tiger)\"                    # Use Tiger BookAPI (https://tiger.bookapi.cc)"
     echo "  ANTIGRAVITY_BASE_URL=\"http://host:8045\" eval \"\$(ccm ag)\""
     echo "  ccm ag health                             # Check Antigravity gateway health"
     echo "  $(basename "$0") status                      # Check current status (masked)"
@@ -1237,6 +1270,7 @@ show_help() {
     echo "  🇨🇳 GLM4.6             - 官方：glm-4.6 / glm-4.5-air"
     echo "  🚦 Antigravity Tools   - 网关：\$ANTIGRAVITY_BASE_URL (default http://127.0.0.1:8045)"
     echo "  🔌 CLIProxyAPI         - 本地代理：\$CLIPROXY_BASE_URL (default http://127.0.0.1:8317)"
+    echo "  🐯 Tiger BookAPI       - https://tiger.bookapi.cc"
     echo "  🧠 Claude Sonnet 4.5   - claude-sonnet-4-5-20250929"
     echo "  🚀 Claude Opus 4.1     - claude-opus-4-1-20250805"
     echo "  🔷 Claude Haiku 4.5    - claude-haiku-4-5"
@@ -1660,6 +1694,28 @@ emit_env_exports() {
                 return 1
             fi
             ;;
+        "tiger")
+            if ! is_effectively_set "$TIGER_API_KEY"; then
+                # 兜底：直接 source 配置文件一次
+                if [ -f "$HOME/.ccm_config" ]; then . "$HOME/.ccm_config" >/dev/null 2>&1; fi
+            fi
+            if is_effectively_set "$TIGER_API_KEY"; then
+                echo "$prelude"
+                echo "export API_TIMEOUT_MS='600000'"
+                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
+                echo "export ANTHROPIC_BASE_URL='https://tiger.bookapi.cc'"
+                echo "export ANTHROPIC_API_URL='https://tiger.bookapi.cc'"
+                echo "if [ -z \"\${TIGER_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
+                echo "export ANTHROPIC_AUTH_TOKEN=\"\${TIGER_API_KEY}\""
+                local tiger_model="${TIGER_MODEL:-claude-sonnet-4-5-20250929}"
+                local tiger_small="${TIGER_SMALL_FAST_MODEL:-claude-sonnet-4-5-20250929}"
+                echo "export ANTHROPIC_MODEL='${tiger_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${tiger_small}'"
+            else
+                echo "# ❌ $(t 'not_detected') TIGER_API_KEY" 1>&2
+                return 1
+            fi
+            ;;
         "claude"|"sonnet"|"s")
             echo "$prelude"
             # 官方 Anthropic 默认网关，无需设置 BASE_URL
@@ -1788,7 +1844,7 @@ emit_env_exports() {
             fi
             ;;
         *)
-            echo "# $(t 'usage'): $(basename "$0") env [deepseek|kimi|qwen|glm|claude|opus|minimax|kat|antigravity|cliproxy]" 1>&2
+            echo "# $(t 'usage'): $(basename "$0") env [deepseek|kimi|qwen|glm|claude|opus|minimax|kat|antigravity|cliproxy|tiger]" 1>&2
             return 1
             ;;
     esac
@@ -1891,6 +1947,9 @@ main() {
             ;;
         "cliproxy"|"cp")
             emit_env_exports cliproxy
+            ;;
+        "tiger")
+            emit_env_exports tiger
             ;;
         "claude"|"sonnet"|"s")
             emit_env_exports claude

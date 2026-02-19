@@ -55,6 +55,7 @@ ccc deepseek     # Launch Claude Code with DeepSeek
 | 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | Zhipu AI |
 | 🚦 **Antigravity Gateway** | ✅ Anthropic-compatible gateway | ❌ N/A | Local gateway (Antigravity Tools), configurable via `ANTIGRAVITY_BASE_URL` |
 | 🔌 **CLIProxyAPI** | ✅ Anthropic-compatible proxy | ❌ N/A | Local proxy ([CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI)), configurable via `CLIPROXY_BASE_URL` |
+| 🐯 **Tiger BookAPI** | ✅ Anthropic-compatible proxy | ❌ N/A | [https://tiger.bookapi.cc](https://tiger.bookapi.cc), configurable via `TIGER_API_KEY` |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ Official only | Balanced performance |
 | 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ Official only | Strongest reasoning |
 | 🔷 **Claude Haiku 4.5** | ✅ claude-haiku-4-5 | ❌ Official only | Fast and efficient |
@@ -189,6 +190,9 @@ CLIPROXY_HAIKU_MODEL=claude-3-5-haiku-20241022
 # CLIProxyAPI local proxy (Anthropic-compatible)
 CLIPROXY_BASE_URL=http://127.0.0.1:8317
 CLIPROXY_API_KEY=sk-cliproxy
+
+# Tiger BookAPI (Anthropic-compatible)
+TIGER_API_KEY=your-tiger-api-key
 
 # Fallback service (only enabled when official keys are missing)
 PPINFRA_API_KEY=your-ppinfra-api-key
@@ -338,6 +342,7 @@ ccm longcat       # Switch to LongCat
 ccm ag            # Switch to Antigravity gateway
 ccm ag health     # Check Antigravity gateway health
 ccm cp            # Switch to CLIProxyAPI local proxy
+ccm tiger         # Switch to Tiger BookAPI
 ccm claude        # Switch to Claude Sonnet 4.5
 ccm opus          # Switch to Claude Opus 4.1
 ccm haiku         # Switch to Claude Haiku 4.5
@@ -358,6 +363,7 @@ ccc opus          # Switch to Claude Opus and launch
 ccc kat           # Switch to StreamLake (KAT) and launch
 ccc ag            # Switch to Antigravity gateway and launch
 ccc cp            # Switch to CLIProxyAPI local proxy and launch
+ccc tiger         # Switch to Tiger BookAPI and launch
 
 # Utility commands
 ccm status        # View current status (masked)

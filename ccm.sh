@@ -1028,12 +1028,12 @@ switch_to_kat() {
 switch_to_tiger() {
     echo -e "${YELLOW}🔄 $(t 'switching_to') Tiger $(t 'model')...${NC}"
     clean_env
-    if is_effectively_set "$TIGER_API_KEY"; then
+    if is_effectively_set "${TIGER_API_KEY:-}"; then
         # Tiger BookAPI 端点
         export ANTHROPIC_BASE_URL="https://tiger.bookapi.cc"
         export ANTHROPIC_API_URL="https://tiger.bookapi.cc"
-        export ANTHROPIC_AUTH_TOKEN="$TIGER_API_KEY"
-        export ANTHROPIC_API_KEY="$TIGER_API_KEY"
+        export ANTHROPIC_AUTH_TOKEN="${TIGER_API_KEY:-}"
+        export ANTHROPIC_API_KEY="${TIGER_API_KEY:-}"
         # Tiger 默认使用 Claude Sonnet 4.5
         local tiger_model="${TIGER_MODEL:-claude-sonnet-4-5-20250929}"
         local tiger_small="${TIGER_SMALL_FAST_MODEL:-claude-sonnet-4-5-20250929}"
@@ -1673,40 +1673,17 @@ emit_env_exports() {
             echo "export ANTHROPIC_DEFAULT_HAIKU_MODEL='${cp_haiku}'"
             ;;
         "tiger")
-            if ! is_effectively_set "$TIGER_API_KEY"; then
+            if ! is_effectively_set "${TIGER_API_KEY:-}"; then
                 # 兜底：直接 source 配置文件一次
                 if [ -f "$HOME/.ccm_config" ]; then . "$HOME/.ccm_config" >/dev/null 2>&1; fi
             fi
-            if is_effectively_set "$TIGER_API_KEY"; then
+            if is_effectively_set "${TIGER_API_KEY:-}"; then
                 echo "$prelude"
                 echo "export API_TIMEOUT_MS='600000'"
                 echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
                 echo "export ANTHROPIC_BASE_URL='https://tiger.bookapi.cc'"
                 echo "export ANTHROPIC_API_URL='https://tiger.bookapi.cc'"
-                echo "if [ -z \"\${TIGER_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
-                echo "export ANTHROPIC_AUTH_TOKEN=\"\${TIGER_API_KEY}\""
-                local tiger_model="${TIGER_MODEL:-claude-sonnet-4-5-20250929}"
-                local tiger_small="${TIGER_SMALL_FAST_MODEL:-claude-sonnet-4-5-20250929}"
-                echo "export ANTHROPIC_MODEL='${tiger_model}'"
-                echo "export ANTHROPIC_SMALL_FAST_MODEL='${tiger_small}'"
-            else
-                echo "# ❌ $(t 'not_detected') TIGER_API_KEY" 1>&2
-                return 1
-            fi
-            ;;
-        "tiger")
-            if ! is_effectively_set "$TIGER_API_KEY"; then
-                # 兜底：直接 source 配置文件一次
-                if [ -f "$HOME/.ccm_config" ]; then . "$HOME/.ccm_config" >/dev/null 2>&1; fi
-            fi
-            if is_effectively_set "$TIGER_API_KEY"; then
-                echo "$prelude"
-                echo "export API_TIMEOUT_MS='600000'"
-                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
-                echo "export ANTHROPIC_BASE_URL='https://tiger.bookapi.cc'"
-                echo "export ANTHROPIC_API_URL='https://tiger.bookapi.cc'"
-                echo "if [ -z \"\${TIGER_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
-                echo "export ANTHROPIC_AUTH_TOKEN=\"\${TIGER_API_KEY}\""
+                echo "export ANTHROPIC_AUTH_TOKEN='${TIGER_API_KEY}'"
                 local tiger_model="${TIGER_MODEL:-claude-sonnet-4-5-20250929}"
                 local tiger_small="${TIGER_SMALL_FAST_MODEL:-claude-sonnet-4-5-20250929}"
                 echo "export ANTHROPIC_MODEL='${tiger_model}'"
